@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/aventureiros")
 @RequiredArgsConstructor
 @Validated
 public class AventureiroController {
@@ -25,7 +26,7 @@ public class AventureiroController {
     private final MapperAventureiro mapperAventureiro;
     private final ServiceAventureiro serviceAventureiro;
 
-    @PostMapping(value = "")
+    @PostMapping
     public ResponseEntity<ResponseAventureiro> registrarAventureiro(@RequestBody @Valid CriarAventureiro dto) {
         Aventureiro aventureiro = mapperAventureiro.toEntity(dto);
         Aventureiro salvo = serviceAventureiro.criar(aventureiro);
@@ -60,13 +61,13 @@ public class AventureiroController {
                 .body(response);
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<Aventureiro> buscarPorId(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseAventureiro> buscarPorId(@PathVariable Long id) {
         Aventureiro aventureiro = serviceAventureiro.buscarPorId(id);
-        return ResponseEntity.ok(aventureiro);
+        return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));
     }
 
-    @PatchMapping(value = "/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ResponseAventureiro> atualizar(
             @PathVariable Long id,
             @Valid @RequestBody AtualizarAventureiro update
@@ -75,19 +76,19 @@ public class AventureiroController {
         return ResponseEntity.ok(mapperAventureiro.toResponse(atualizado));
     }
 
-    @PatchMapping(value = "/{id}/encerrar-vinculo")
+    @PatchMapping("/{id}/encerrar-vinculo")
     public ResponseEntity<ResponseAventureiro> encerrarVinculo(@PathVariable Long id) {
         Aventureiro aventureiro = serviceAventureiro.encerrarVinculo(id);
         return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));
     }
 
-    @PatchMapping(value = "/{id}/recrutar")
+    @PatchMapping("/{id}/recrutar")
     public ResponseEntity<ResponseAventureiro> recrutarNovamente(@PathVariable Long id) {
         Aventureiro aventureiro = serviceAventureiro.recrutarNovamente(id);
         return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));
     }
 
-    @PutMapping(value = "/{id}/companheiro")
+    @PutMapping("/{id}/companheiro")
     public ResponseEntity<ResponseAventureiro> definirCompanheiro(
             @PathVariable Long id,
             @Valid @RequestBody DefinirCompanheiro dto
@@ -96,7 +97,7 @@ public class AventureiroController {
         return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));
     }
 
-    @PatchMapping(value = "/{id}/remover-companheiro")
+    @PatchMapping("/{id}/remover-companheiro")
     public ResponseEntity<ResponseAventureiro> removerCompanheiro(@PathVariable Long id) {
         Aventureiro aventureiro = serviceAventureiro.removerCompanheiro(id);
         return ResponseEntity.ok(mapperAventureiro.toResponse(aventureiro));

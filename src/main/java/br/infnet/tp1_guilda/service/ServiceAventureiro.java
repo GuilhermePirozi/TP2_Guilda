@@ -1,15 +1,16 @@
 package br.infnet.tp1_guilda.service;
 
-import br.infnet.tp1_guilda.dto.AtualizarAventureiro;
-import br.infnet.tp1_guilda.dto.DefinirCompanheiro;
-import br.infnet.tp1_guilda.dto.FilterRequestAventureiro;
-import br.infnet.tp1_guilda.dto.PageResult;
-import br.infnet.tp1_guilda.exceptions.AventureiroNotFoundException;
 import br.infnet.tp1_guilda.models.Aventureiro;
-import br.infnet.tp1_guilda.models.Companheiro;
 import br.infnet.tp1_guilda.repository.RepositoryAventureiro;
+import br.infnet.tp1_guilda.exceptions.AventureiroNotFoundException;
+import br.infnet.tp1_guilda.exceptions.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import br.infnet.tp1_guilda.dto.AtualizarAventureiro;
+import br.infnet.tp1_guilda.dto.FilterRequestAventureiro;
+import br.infnet.tp1_guilda.dto.PageResult;
+import br.infnet.tp1_guilda.dto.DefinirCompanheiro;
+import br.infnet.tp1_guilda.models.Companheiro;
 
 @Service
 @RequiredArgsConstructor
@@ -30,32 +31,53 @@ public class ServiceAventureiro {
 
         Aventureiro aventureiro = buscarPorId(id);
 
-        if (update.nome() != null)
+        if (update.nome() != null) {
+            if (update.nome().isBlank()) {
+                throw new BusinessException("O nome do aventureiro não pode ser vazio.");
+            }
             aventureiro.alterarNome(update.nome());
+        }
 
-        if (update.classe() != null)
+        if (update.classe() != null) {
             aventureiro.alterarClasse(update.classe());
+        }
 
-        if (update.nivel() != null)
+        if (update.nivel() != null) {
             aventureiro.alterarNivel(update.nivel());
+        }
 
         return repositoryAventureiro.save(aventureiro);
     }
 
     public Aventureiro encerrarVinculo(Long id) {
         Aventureiro aventureiro = buscarPorId(id);
+
+        if (!aventureiro.getAtivo()) {
+            throw new BusinessException("O aventureiro já está inativo.");
+        }
+
         aventureiro.encerrarVinculo();
         return repositoryAventureiro.save(aventureiro);
     }
 
     public Aventureiro recrutarNovamente(Long id) {
         Aventureiro aventureiro = buscarPorId(id);
+
+        if (aventureiro.getAtivo()) {
+            throw new BusinessException("O aventureiro já está ativo.");
+        }
+
         aventureiro.recrutar();
         return repositoryAventureiro.save(aventureiro);
     }
 
     public Aventureiro removerCompanheiro(Long id) {
         Aventureiro aventureiro = buscarPorId(id);
+
+        if (aventureiro.getCompanheiro() == null) {
+            throw new BusinessException("O aventureiro não possui companheiro para remover.");
+        }
+
         aventureiro.removerCompanheiro();
         return repositoryAventureiro.save(aventureiro);
     }
