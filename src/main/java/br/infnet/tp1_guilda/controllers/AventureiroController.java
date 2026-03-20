@@ -3,7 +3,7 @@ package br.infnet.tp1_guilda.controllers;
 import br.infnet.tp1_guilda.service.ServiceAventureiro;
 import br.infnet.tp1_guilda.dto.*;
 import br.infnet.tp1_guilda.mapper.*;
-import br.infnet.tp1_guilda.models.Aventureiro;
+import br.infnet.tp1_guilda.domain.aventureiro.Aventureiro;
 import br.infnet.tp1_guilda.enums.Classe;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;

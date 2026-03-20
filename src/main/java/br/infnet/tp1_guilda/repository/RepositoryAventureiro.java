@@ -2,7 +2,7 @@ package br.infnet.tp1_guilda.repository;
 
 import br.infnet.tp1_guilda.dto.FilterRequestAventureiro;
 import br.infnet.tp1_guilda.dto.PageResult;
-import br.infnet.tp1_guilda.models.Aventureiro;
+import br.infnet.tp1_guilda.domain.aventureiro.Aventureiro;
 
 import java.util.List;
 import java.util.Optional;

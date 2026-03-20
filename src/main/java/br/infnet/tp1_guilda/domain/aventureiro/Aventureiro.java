@@ -1,4 +1,4 @@
-package br.infnet.tp1_guilda.models;
+package br.infnet.tp1_guilda.domain.aventureiro;
 
 import br.infnet.tp1_guilda.enums.Classe;
 import jakarta.validation.Valid;

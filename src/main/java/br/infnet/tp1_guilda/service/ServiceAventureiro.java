@@ -1,6 +1,6 @@
 package br.infnet.tp1_guilda.service;
 
-import br.infnet.tp1_guilda.models.Aventureiro;
+import br.infnet.tp1_guilda.domain.aventureiro.Aventureiro;
 import br.infnet.tp1_guilda.repository.RepositoryAventureiro;
 import br.infnet.tp1_guilda.exceptions.AventureiroNotFoundException;
 import br.infnet.tp1_guilda.exceptions.BusinessException;
@@ -10,7 +10,7 @@ import br.infnet.tp1_guilda.dto.AtualizarAventureiro;
 import br.infnet.tp1_guilda.dto.FilterRequestAventureiro;
 import br.infnet.tp1_guilda.dto.PageResult;
 import br.infnet.tp1_guilda.dto.DefinirCompanheiro;
-import br.infnet.tp1_guilda.models.Companheiro;
+import br.infnet.tp1_guilda.domain.aventureiro.Companheiro;
 
 @Service
 @RequiredArgsConstructor
