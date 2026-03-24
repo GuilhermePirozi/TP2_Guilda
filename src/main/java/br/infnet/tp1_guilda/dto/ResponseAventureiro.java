@@ -1,7 +1,7 @@
 package br.infnet.tp1_guilda.dto;
 
 import br.infnet.tp1_guilda.enums.Classe;
-import br.infnet.tp1_guilda.domain.aventureiro.Aventureiro;
+import br.infnet.tp1_guilda.domain.aventura.Aventureiro;
 
 public record ResponseAventureiro(
         Long id,
