@@ -1,18 +1,25 @@
 package br.infnet.tp1_guilda.domain.aventura;
 
 import br.infnet.tp1_guilda.enums.Classe;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
+@Entity
 @Getter
 @ToString
+@NoArgsConstructor
 public class Aventureiro {
     @Setter
+    @Id
+    @Column(name = "aventureiro_id")
     private Long id;
     @NotBlank(message = "Tem que haver um nome")
     private String nome;
@@ -23,6 +30,11 @@ public class Aventureiro {
     @NotNull
     private Boolean ativo;
     @Valid
+    @OneToOne(
+            mappedBy = "aventureiro",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private Companheiro companheiro;
 
 

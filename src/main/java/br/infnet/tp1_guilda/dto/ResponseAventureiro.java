@@ -1,7 +1,6 @@
 package br.infnet.tp1_guilda.dto;
 
 import br.infnet.tp1_guilda.enums.Classe;
-import br.infnet.tp1_guilda.domain.aventura.Aventureiro;
 
 public record ResponseAventureiro(
         Long id,
@@ -9,14 +8,4 @@ public record ResponseAventureiro(
         Classe classe,
         int nivel,
         boolean ativo
-) {
-    public ResponseAventureiro(Aventureiro aventureiro) {
-        this(
-                aventureiro.getId(),
-                aventureiro.getNome(),
-                aventureiro.getClasse(),
-                aventureiro.getNivel(),
-                aventureiro.getAtivo()
-        );
-    }
-}
+) { }
