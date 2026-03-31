@@ -1,5 +1,7 @@
 package br.infnet.tp1_guilda.domain.aventura;
 
+import br.infnet.tp1_guilda.domain.audit.Organization;
+import br.infnet.tp1_guilda.domain.audit.User;
 import br.infnet.tp1_guilda.enums.Classe;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -11,38 +13,74 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Date;
+
 
 @Entity
-@Getter
-@ToString
+@Getter @Setter
 @NoArgsConstructor
+@Table(name = "aventureiros", schema = "aventura")
 public class Aventureiro {
-    @Setter
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "aventureiro_id")
     private Long id;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "organizacao_id", nullable = false)
+    private Organization organizacao;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private User user;
     @NotBlank(message = "Tem que haver um nome")
+    @Column(name = "nome", nullable = false, length = 120)
     private String nome;
+    @Enumerated(EnumType.STRING)
     @NotNull(message = "Tem que haver uma classe")
+    @Column(name = "classe", nullable = false)
     private Classe classe;
     @Min(value = 1, message = "O nível deve ser maior ou igual a 1")
+    @Column(name = "nivel", nullable = false)
     private int nivel;
     @NotNull
+    @Column(name = "ativo", nullable = false)
     private Boolean ativo;
+    @Column(name = "data_criacao", nullable = false, updatable = false)
+    private OffsetDateTime dataCriacao;
     @Valid
-    @OneToOne(
-            mappedBy = "aventureiro",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToOne(mappedBy = "aventureiro", cascade = CascadeType.ALL, orphanRemoval = true)
     private Companheiro companheiro;
+    @Column(name = "data_atualizacao", nullable = false)
+    private OffsetDateTime dataAtualizacao;
 
+    @PrePersist
+    public void prePersist() {
+        OffsetDateTime agora = OffsetDateTime.now();
+        if (this.dataCriacao == null) {
+            this.dataCriacao = agora;
+        }
+        this.dataAtualizacao = agora;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.dataAtualizacao = OffsetDateTime.now();
+    }
+
+    public Aventureiro(Organization organizacao, User user, String nome, Classe classe, int nivel) {
+        this.organizacao = organizacao;
+        this.user = user;
+        this.nome = nome;
+        this.classe = classe;
+        this.nivel = nivel;
+        this.ativo = true;
+    }
 
     public Aventureiro(String nome, Classe classe, int nivel) {
         this.nome = nome;
         this.classe = classe;
         this.nivel = nivel;
-        this.ativo = true;
     }
 
     public void alterarNome(String nome) {

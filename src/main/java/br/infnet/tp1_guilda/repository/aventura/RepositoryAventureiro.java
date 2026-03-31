@@ -1,4 +1,4 @@
-package br.infnet.tp1_guilda.repository;
+package br.infnet.tp1_guilda.repository.aventura;
 
 import br.infnet.tp1_guilda.domain.aventura.Aventureiro;
 import br.infnet.tp1_guilda.dto.FilterRequestAventureiro;

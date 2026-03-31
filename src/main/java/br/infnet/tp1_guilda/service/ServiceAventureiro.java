@@ -1,7 +1,7 @@
 package br.infnet.tp1_guilda.service;
 
 import br.infnet.tp1_guilda.domain.aventura.Aventureiro;
-import br.infnet.tp1_guilda.repository.RepositoryAventureiro;
+import br.infnet.tp1_guilda.repository.aventura.RepositoryAventureiro;
 import br.infnet.tp1_guilda.exceptions.AventureiroNotFoundException;
 import br.infnet.tp1_guilda.exceptions.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,14 @@ public class ServiceAventureiro {
     private final RepositoryAventureiro repositoryAventureiro;
 
     public Aventureiro criar(Aventureiro aventureiro) {
+        if (aventureiro.getOrganizacao() == null) {
+            throw new BusinessException("O aventureiro deve estar vinculado a uma organização.");
+        }
+
+        if (aventureiro.getUser() == null) {
+            throw new BusinessException("O aventureiro deve possuir um usuário responsável.");
+        }
+
         return repositoryAventureiro.save(aventureiro);
     }
 
@@ -88,6 +96,10 @@ public class ServiceAventureiro {
 
     public Aventureiro definirCompanheiro(Long id, DefinirCompanheiro dto) {
         Aventureiro aventureiro = buscarPorId(id);
+
+        if (aventureiro.getCompanheiro() != null) {
+            throw new BusinessException("O aventureiro já possui um companheiro.");
+        }
 
         Companheiro companheiro = new Companheiro(
                 dto.nome(),
