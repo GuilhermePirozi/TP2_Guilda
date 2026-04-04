@@ -24,7 +24,13 @@ import java.util.Date;
 @Table(name = "aventureiros", schema = "aventura")
 public class Aventureiro {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "aventureiroId")
+    @SequenceGenerator(
+            name = "aventureiroId",
+            sequenceName = "aventureiro_seq",
+            allocationSize = 1,
+            schema = "aventura"
+    )
     @Column(name = "aventureiro_id")
     private Long id;
     @ManyToOne(optional = false)
@@ -75,12 +81,6 @@ public class Aventureiro {
         this.classe = classe;
         this.nivel = nivel;
         this.ativo = true;
-    }
-
-    public Aventureiro(String nome, Classe classe, int nivel) {
-        this.nome = nome;
-        this.classe = classe;
-        this.nivel = nivel;
     }
 
     public void alterarNome(String nome) {

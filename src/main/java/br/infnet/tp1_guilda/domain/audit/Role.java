@@ -26,7 +26,13 @@ import java.util.Set;
 public class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rolesIdSeq")
+    @SequenceGenerator(
+            name = "rolesIdSeq",
+            sequenceName = "roles_id_seq",
+            allocationSize = 1,
+            schema = "audit"
+    )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

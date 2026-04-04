@@ -16,7 +16,13 @@ import java.time.OffsetDateTime;
 public class AuditEntry {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "auditEntriesIdSeq")
+    @SequenceGenerator(
+            name = "auditEntriesIdSeq",
+            sequenceName = "audit_entries_id_seq",
+            allocationSize = 1,
+            schema = "audit"
+    )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

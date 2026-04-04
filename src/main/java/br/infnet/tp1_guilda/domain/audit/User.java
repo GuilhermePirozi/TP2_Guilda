@@ -29,7 +29,13 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,  generator = "usuariosIdSeq")
+    @SequenceGenerator(
+            name = "usuariosIdSeq",
+            sequenceName = "usuarios_id_seq",
+            allocationSize = 1,
+            schema = "audit"
+    )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

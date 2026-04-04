@@ -1,89 +1,101 @@
 package br.infnet.tp1_guilda.service;
 
 import br.infnet.tp1_guilda.domain.aventura.Missao;
-import br.infnet.tp1_guilda.domain.aventura.enums.NivelPerigo;
-import br.infnet.tp1_guilda.domain.aventura.enums.StatusMissao;
+import br.infnet.tp1_guilda.dto.PageResult;
+import br.infnet.tp1_guilda.dto.consulta.missao.FilterConsultaMissao;
+import br.infnet.tp1_guilda.dto.missao.AtualizarMissao;
+import br.infnet.tp1_guilda.dto.missao.CriarMissao;
 import br.infnet.tp1_guilda.exceptions.BusinessException;
+import br.infnet.tp1_guilda.exceptions.MissaoNotFoundException;
+import br.infnet.tp1_guilda.mapper.MapperMissao;
+import br.infnet.tp1_guilda.repository.audit.OrganizationRepository;
+import br.infnet.tp1_guilda.repository.aventura.MissaoSpecifications;
 import br.infnet.tp1_guilda.repository.aventura.RepositoryMissao;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import java.time.OffsetDateTime;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MissaoService {
 
     private final RepositoryMissao repository;
+    private final OrganizationRepository organizationRepository;
+    private final MapperMissao mapperMissao;
 
-    public MissaoService(RepositoryMissao repository) {
-        this.repository = repository;
-    }
-
-    public Missao criar(Missao missao) {
+    public Missao criar(CriarMissao dto) {
+        var organizacao = organizationRepository.findById(dto.organizacaoId())
+                .orElseThrow(() -> new BusinessException("Organização não encontrada."));
+        Missao missao = mapperMissao.toEntity(organizacao, dto);
         validarMissaoParaCriacao(missao);
         return repository.save(missao);
     }
 
     public Missao buscarPorId(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new BusinessException("Missão com id " + id + " não encontrada."));
+                .orElseThrow(() -> new MissaoNotFoundException(id));
     }
 
-    public List<Missao> listarTodas() {
-        return repository.findAll();
+    @Transactional(readOnly = true)
+    public Missao buscarDetalhado(Long id) {
+        return repository.findDetalhadoById(id)
+                .orElseThrow(() -> new MissaoNotFoundException(id));
     }
 
-    public Missao atualizarTitulo(Long id, String titulo) {
+    @Transactional(readOnly = true)
+    public PageResult<Missao> consultar(
+            FilterConsultaMissao filtro,
+            int page,
+            int size,
+            String ordenarPor,
+            boolean ordemDecrescente
+    ) {
+        Specification<Missao> spec = MissaoSpecifications.comFiltro(filtro);
+        Sort.Direction dir = ordemDecrescente ? Sort.Direction.DESC : Sort.Direction.ASC;
+        String campo = resolverCampoOrdenacaoMissao(ordenarPor);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(dir, campo));
+        Page<Missao> resultado = repository.findAll(spec, pageable);
+        return new PageResult<>(
+                resultado.getNumber(),
+                resultado.getSize(),
+                (int) resultado.getTotalElements(),
+                resultado.getContent()
+        );
+    }
+
+    private static String resolverCampoOrdenacaoMissao(String ordenarPor) {
+        if (ordenarPor == null) {
+            return "titulo";
+        }
+        return switch (ordenarPor.toLowerCase()) {
+            case "datacriacao", "data_criacao" -> "dataCriacao";
+            case "status" -> "status";
+            case "nivelperigo", "nivel_perigo" -> "nivelPerigo";
+            default -> "titulo";
+        };
+    }
+
+    public Missao atualizar(Long id, AtualizarMissao dto) {
         Missao missao = buscarPorId(id);
 
-        if (titulo == null || titulo.isBlank()) {
-            throw new BusinessException("O título da missão é obrigatório.");
+        if (dto.titulo() != null) {
+            if (dto.titulo().isBlank()) {
+                throw new BusinessException("O título da missão é obrigatório.");
+            }
+            if (dto.titulo().length() > 150) {
+                throw new BusinessException("O título da missão deve ter no máximo 150 caracteres.");
+            }
         }
 
-        if (titulo.length() > 150) {
-            throw new BusinessException("O título da missão deve ter no máximo 150 caracteres.");
-        }
-
-        missao.alterarTitulo(titulo);
-        return repository.save(missao);
-    }
-
-    public Missao atualizarNivelPerigo(Long id, NivelPerigo nivelPerigo) {
-        Missao missao = buscarPorId(id);
-
-        if (nivelPerigo == null) {
-            throw new BusinessException("O nível de perigo é obrigatório.");
-        }
-
-        missao.alterarNivelPerigo(nivelPerigo);
-        return repository.save(missao);
-    }
-
-    public Missao atualizarStatus(Long id, StatusMissao status) {
-        Missao missao = buscarPorId(id);
-
-        if (status == null) {
-            throw new BusinessException("O status da missão é obrigatório.");
-        }
-
-        missao.alterarStatus(status);
-        return repository.save(missao);
-    }
-
-    public Missao definirDataInicio(Long id, OffsetDateTime dataInicio) {
-        Missao missao = buscarPorId(id);
-
-        missao.definirDataInicio(dataInicio);
+        mapperMissao.aplicarAtualizacao(missao, dto);
         validarDatas(missao);
-
-        return repository.save(missao);
-    }
-
-    public Missao definirDataTermino(Long id, OffsetDateTime dataTermino) {
-        Missao missao = buscarPorId(id);
-
-        missao.definirDataTermino(dataTermino);
-        validarDatas(missao);
-
         return repository.save(missao);
     }
 

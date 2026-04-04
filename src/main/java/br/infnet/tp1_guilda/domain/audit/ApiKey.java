@@ -21,7 +21,13 @@ import java.time.OffsetDateTime;
 public class ApiKey {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "apiKeysIdSeq")
+    @SequenceGenerator(
+            name = "apiKeysIdSeq",
+            sequenceName = "api_keys_id_seq",
+            allocationSize = 1,
+            schema = "audit"
+    )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

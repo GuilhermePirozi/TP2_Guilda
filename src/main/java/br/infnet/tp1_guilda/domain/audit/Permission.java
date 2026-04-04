@@ -13,7 +13,13 @@ import lombok.*;
 public class Permission {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permissionsIdSeq")
+    @SequenceGenerator(
+            name = "permissionsIdSeq",
+            sequenceName = "permissions_id_seq",
+            allocationSize = 1,
+            schema = "audit"
+    )
     private Long id;
 
     @Column(name = "code", nullable = false, length = 80, unique = true)

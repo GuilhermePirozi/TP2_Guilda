@@ -20,7 +20,13 @@ import java.util.List;
 public class Missao {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "missaoId")
+    @SequenceGenerator(
+            name = "missaoId",
+            sequenceName = "missao_seq",
+            allocationSize = 1,
+            schema = "aventura"
+    )
     @Column(name = "missao_id")
     private Long id;
 
